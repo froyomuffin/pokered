@@ -49,7 +49,6 @@ ROMX $4
 	"Battle Engine 1"
 ROMX $5
 	"NPC Sprites 2"
-	"Battle Engine 2"
 ROMX $6
 	"Maps 1"
 	"Play Time"
@@ -177,6 +176,8 @@ ROMX $2B
 	"Pokédex Text"
 ROMX $2C
 	"Move Names"
+ROMX $2D
+	"Battle Engine 2"
 WRAM0
 	"Audio RAM"
 	org $c100

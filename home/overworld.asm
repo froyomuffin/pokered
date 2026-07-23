@@ -2031,7 +2031,7 @@ LoadBikePlayerSpriteGraphics::
 	ld hl, vNPCSprites
 
 LoadRunningPlayerSpriteGraphics::
-	ld de, RedSprite
+	ld de, RedRunSprite
 	ld hl, vNPCSprites
 	jr LoadPlayerSpriteGraphicsCommon
 
