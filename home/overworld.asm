@@ -261,6 +261,7 @@ OverworldLoopLessDelay::
 	jp c, OverworldLoop
 
 .noCollision
+	call .TryRunning
 	ld a, $08
 	ld [wWalkCounter], a
 	jr .moveAhead2
@@ -278,6 +279,16 @@ OverworldLoopLessDelay::
 	res BIT_TURNING, [hl]
 	ld a, [wWalkBikeSurfState]
 	dec a ; riding a bike?
+	jr nz, .checkIfRunning
+	ld a, [wMovementFlags]
+	bit BIT_LEDGE_OR_FISHING, a
+	jr nz, .checkIfRunning
+	call DoBikeSpeedup
+	jr .normalPlayerSpriteAdvancement
+
+.checkIfRunning
+	ld a, [wWalkBikeSurfState]
+	cp $03 ; running?
 	jr nz, .normalPlayerSpriteAdvancement
 	ld a, [wMovementFlags]
 	bit BIT_LEDGE_OR_FISHING, a
@@ -356,6 +367,38 @@ OverworldLoopLessDelay::
 	ld [wIsInBattle], a
 	call RunMapScript
 	jp HandleBlackOut
+
+.TryRunning
+; If B is held and player is walking, switch to running.
+; If B is released and player is running, switch back to walking.
+; When standing still, always show walking sprite.
+	ldh a, [hJoyHeld]
+	ld b, a
+	ld a, [wWalkBikeSurfState]
+	cp $02
+	jr z, .skipRunning
+	bit B_PAD_B, b
+	jr nz, .bHeld
+; B is not held
+	cp $03
+	jr nz, .skipRunning
+; Running and B released - switch to walking
+	xor a
+	ld [wWalkBikeSurfState], a
+	call LoadWalkingPlayerSpriteGraphics
+	ret
+
+.bHeld
+; B is held
+	and a
+	jr nz, .skipRunning ; only switch to running when walking
+	ld a, $03
+	ld [wWalkBikeSurfState], a
+	call LoadRunningPlayerSpriteGraphics
+	ret
+
+.skipRunning
+	ret
 
 ; function to determine if there will be a battle and execute it (either a trainer battle or wild battle)
 ; sets carry if a battle occurred and unsets carry if not
@@ -807,6 +850,7 @@ LoadPlayerSpriteGraphics::
 	; 0: standing
 	; 1: biking
 	; 2: surfing
+	; 3: running
 
 	ld a, [wWalkBikeSurfState]
 	dec a
@@ -837,6 +881,8 @@ LoadPlayerSpriteGraphics::
 	jp z, LoadBikePlayerSpriteGraphics
 	dec a
 	jp z, LoadSurfingPlayerSpriteGraphics
+	dec a
+	jp z, LoadRunningPlayerSpriteGraphics
 	jp LoadWalkingPlayerSpriteGraphics
 
 IsBikeRidingAllowed::
@@ -1983,6 +2029,11 @@ LoadSurfingPlayerSpriteGraphics::
 LoadBikePlayerSpriteGraphics::
 	ld de, RedBikeSprite
 	ld hl, vNPCSprites
+
+LoadRunningPlayerSpriteGraphics::
+	ld de, RedSprite
+	ld hl, vNPCSprites
+	jr LoadPlayerSpriteGraphicsCommon
 
 LoadPlayerSpriteGraphicsCommon::
 	push de

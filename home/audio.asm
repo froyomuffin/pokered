@@ -24,6 +24,8 @@ PlayDefaultMusicCommon::
 	jr z, .walking
 	cp $2
 	jr z, .surfing
+	cp $3
+	jr z, .walking
 	ld a, MUSIC_BIKE_RIDING
 	jr .next
 

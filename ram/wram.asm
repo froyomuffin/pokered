@@ -2050,6 +2050,7 @@ wObtainedHiddenCoinsFlags:: flag_array MAX_HIDDEN_COINS
 ; $00 = walking
 ; $01 = biking
 ; $02 = surfing
+; $03 = running
 wWalkBikeSurfState:: db
 
 	ds 10
