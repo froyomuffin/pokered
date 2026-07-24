@@ -138,6 +138,7 @@ OverworldLoopLessDelay::
 	jr nz, .skipReset
 	xor a
 	ld [wWalkBikeSurfState], a
+	call LoadWalkingPlayerSpriteGraphics
 .skipReset
 	ld a, 1
 	ld [wCheckFor180DegreeTurn], a
@@ -382,12 +383,12 @@ OverworldLoopLessDelay::
 	ld b, a
 	ld a, [wWalkBikeSurfState]
 	cp $02
-	jr z, .skipRunning
+	ret z ; surfing, skip
 	bit B_PAD_B, b
 	jr nz, .bHeld
 ; B is not held
 	cp $03
-	jr nz, .skipRunning
+	ret nz ; not running, skip
 ; Running and B released - switch to walking
 	xor a
 	ld [wWalkBikeSurfState], a
@@ -397,13 +398,10 @@ OverworldLoopLessDelay::
 .bHeld
 ; B is held
 	and a
-	jr nz, .skipRunning ; only switch to running when walking
+	ret nz ; only switch to running when walking
 	ld a, $03
 	ld [wWalkBikeSurfState], a
 	call LoadRunningPlayerSpriteGraphics
-	ret
-
-.skipRunning
 	ret
 
 ; function to determine if there will be a battle and execute it (either a trainer battle or wild battle)
