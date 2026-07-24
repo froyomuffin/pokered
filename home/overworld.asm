@@ -133,6 +133,12 @@ OverworldLoopLessDelay::
 	ld hl, wMiscFlags
 	res BIT_TURNING, [hl]
 	call UpdateSprites
+	ld a, [wWalkBikeSurfState]
+	cp $03
+	jr nz, .skipReset
+	xor a
+	ld [wWalkBikeSurfState], a
+.skipReset
 	ld a, 1
 	ld [wCheckFor180DegreeTurn], a
 	ld a, [wPlayerMovingDirection] ; the direction that was pressed last time
